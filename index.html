@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Off the Loop - Breaking Free from Doomscrolling</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #404040;
+            --accent: #2563eb;
+            --accent-light: #3b82f6;
+            --bg: #f8f9fa;
+            --text: #1a1a1a;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #f0f0f0;
+                --secondary: #d0d0d0;
+                --bg: #0f0f0f;
+                --text: #f0f0f0;
+                --text-light: #b0b0b0;
+                --border: #333333;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Header Navigation */
+        header {
+            background: transparent;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        nav {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text);
+            transition: color 0.3s;
+        }
+
+        .logo:hover {
+            color: var(--accent);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-light);
+            margin-left: 2rem;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 900px;
+            margin: 4rem auto 3rem;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .hero-tagline {
+            font-size: 0.95rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Blog Posts Grid */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .post-card {
+            background: var(--primary);
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+        }
+
+        .post-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        .post-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .post-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            flex-grow: 1;
+            margin-bottom: 1rem;
+        }
+
+        .post-meta {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .post-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 2rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--bg);
+            max-width: 700px;
+            width: 100%;
+            padding: 3rem;
+            border-radius: 12px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--border);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header .meta {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .modal-body h3 {
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--accent);
+        }
+
+        .modal-body p {
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        .modal-body ul, .modal-body ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-body li {
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .highlight {
+            background: rgba(37, 99, 235, 0.1);
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent);
+            border-radius: 4px;
+            margin: 1.5rem 0;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav a {
+                margin-left: 0;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#" class="logo">Off the Loop</a>
+            <div>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <section class="hero">
+            <span class="hero-tagline">Digital Wellness</span>
+            <h1>Off the Loop</h1>
+            <p>A journey to breaking free from doomscrolling and reclaiming your attention</p>
+        </section>
+
+        <section class="posts-grid">
+            <article class="post-card" onclick="openModal(0)">
+                <span class="post-number">01</span>
+                <h3>How I freed myself from doomscrolling (without deleting all my apps)</h3>
+                <p>Three small but effective rules that actually stick: no phone first 30 minutes awake, grayscale mode, and app timers that I actually kept.</p>
+                <div class="post-meta">
+                    <span>📖 5 min read</span>
+                    <span>💡 Rules</span>
+                </div>
+            </article>
+
+            <article class="post-card" onclick="openModal(1)">
+                <span class="post-number">02</span>
+                <h3>What filled the time instead of my morning scroll</h3>
+                <p>Real activities that replaced my reflexive phone habit: stretching, making tea, staring out a window, listening to one song fully.</p>
+                <div class="post-meta">
+                    <span>📖 4 min read</span>
+                    <span>🎯 Habits</span>
+                </div>
+            </article>
+
+            <article class="post-card" onclick="openModal(2)">
+                <span class="post-number">03</span>
+                <h3>The 10-minute urge check: A game-changer for reflexive phone grabs</h3>
+                <p>A simple technique to pause before picking up your phone. When the urge hits, ask yourself if you can wait 10 minutes. The results surprised me.</p>
+                <div class="post-meta">
+                    <span>📖 5 min read</span>
+                    <span>🛠️ Technique</span>
+                </div>
+            </article>
+
+            <article class="post-card" onclick="openModal(3)">
+                <span class="post-number">04</span>
+                <h3>Why quitting cold turkey failed (and what worked instead)</h3>
+                <p>Honest talk about relapse and finding a middle path. My attempts to go completely phoneless only lasted days. Here's what actually worked.</p>
+                <div class="post-meta">
+                    <span>📖 6 min read</span>
+                    <span>🚀 Progress</span>
+                </div>
+            </article>
+
+            <article class="post-card" onclick="openModal(4)">
+                <span class="post-number">05</span>
+                <h3>My monthly phone audit: What I cut, kept, and questioned</h3>
+                <p>A repeatable habit for staying aware without guilt. This monthly practice helps me review my apps, screen time, and digital habits intentionally.</p>
+                <div class="post-meta">
+                    <span>📖 7 min read</span>
+                    <span>📊 System</span>
+                </div>
+            </article>
+        </section>
+    </div>
+
+    <section class="container" id="about">
+        <div style="max-width: 600px; margin: 3rem auto; padding: 2rem; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.02);">
+            <h2 style="margin-bottom: 1rem;">About this blog</h2>
+            <p style="color: var(--text-light); margin-bottom: 1rem;">
+                This is a collection of real strategies and honest reflections on breaking free from doomscrolling. Not a guide to eliminate technology, but a journey toward intentional use.
+            </p>
+            <p style="color: var(--text-light);">
+                Each post shares practical techniques, hard-won lessons, and what actually worked when everything else failed.
+            </p>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <p>Off the Loop © 2024 • A blog about digital wellness</p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">Built with intention. Shared openly.</p>
+    </footer>
+
+    <!-- Modal for full posts -->
+    <div class="modal" id="postModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <div class="meta" id="modalMeta"></div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const posts = [
+            {
+                title: "How I freed myself from doomscrolling (without deleting all my apps)",
+                meta: "5 min read • 2024",
+                content: `
+                    <p>The turning point wasn't when I decided to quit. It was when I realized I didn't have to be perfect about it.</p>
+
+                    <h3>The three rules that stuck</h3>
+                    <p>After years of feeling enslaved by my phone, I implemented three simple rules. Not because I'm disciplined, but because they actually work with my brain instead of against it.</p>
+
+                    <div class="highlight">
+                        <strong>Rule 1: No phone first 30 minutes awake</strong><br>
+                        This is the easiest win. My morning is now for stretching, coffee, and thinking. By the time I reach for my phone, I've already "won" the day's first battle.
+                    </div>
+
+                    <div class="highlight">
+                        <strong>Rule 2: Grayscale mode after 7 PM</strong><br>
+                        Colors trigger dopamine. Removing them is subtle but powerful. My phone becomes a tool, not a toy. It's still in my hand, but it's less interesting.
+                    </div>
+
+                    <div class="highlight">
+                        <strong>Rule 3: App timers that I actually maintain</strong><br>
+                        I don't delete apps—that's unrealistic. Instead, I use built-in timers. Twitter: 15 min. Reddit: 10 min. The alerts work because I set them to be annoying, not subtle.
+                    </div>
+
+                    <h3>What made these work</h3>
+                    <p>These aren't revolutionary. But they're flexible enough that I don't feel like I'm "failing" when I hit my limit. I'm just following the rules. No willpower needed—just systems.</p>
+
+                    <p><strong>The real insight:</strong> You don't need willpower. You need rules that make the right choice the easy choice.</p>
+                `
+            },
+            {
+                title: "What filled the time instead of my morning scroll",
+                meta: "4 min read • 2024",
+                content: `
+                    <p>Here's what nobody tells you about quitting doomscrolling: you suddenly have 30 minutes of your life back every morning. The question becomes: what do you do with it?</p>
+
+                    <h3>The replacement activities</h3>
+                    <p>I didn't start with ambitious goals. I just needed something to do with my hands.</p>
+
+                    <ul>
+                        <li><strong>Stretching (5 min):</strong> Not a workout. Just moving my body gently while waking up.</li>
+                        <li><strong>Making tea properly (8 min):</strong> Not rushed. Noticing the warmth, the smell. It's meditative.</li>
+                        <li><strong>Looking out the window (5 min):</strong> No phone. Just observing the world. Boring? Yes. Restorative? Absolutely.</li>
+                        <li><strong>One full song (3 min):</strong> No skipping. No phone. Just listening.</li>
+                        <li><strong>Writing three thoughts (5 min):</strong> Not a journal. Just stream of consciousness.</li>
+                    </ul>
+
+                    <h3>Why these work</h3>
+                    <p>They're all slow. They require minimal setup. They don't feel like "productivity." That's the key—I wasn't replacing doomscrolling with exercise guilt. I was replacing it with calm.</p>
+
+                    <div class="highlight">
+                        The morning transformation happened gradually. After two weeks, I noticed I wasn't anxious when opening email. After a month, my whole day felt different.
+                    </div>
+
+                    <p>Your replacement activities don't need to be profound. They just need to be slower than scrolling.</p>
+                `
+            },
+            {
+                title: "The 10-minute urge check: A game-changer for reflexive phone grabs",
+                meta: "5 min read • 2024",
+                content: `
+                    <p>The most dangerous time for doomscrolling isn't when you consciously want to scroll. It's when your hand moves to your pocket automatically, before your brain even notices.</p>
+
+                    <h3>How the 10-minute urge check works</h3>
+                    <p>It's absurdly simple, but it works: when you feel the urge to pick up your phone, ask yourself one question: "Can I wait 10 minutes?"</p>
+
+                    <p>If yes, set a timer. Do something else. Anything else. When the timer goes off, check in again.</p>
+
+                    <p><strong>The magic:</strong> 90% of the time, the urge is gone.</p>
+
+                    <h3>Why this breaks the reflex loop</h3>
+                    <p>Doomscrolling isn't a conscious choice—it's a reflex. Your brain says "I'm bored/anxious/stuck" and your hand goes to your pocket before you can think. The 10-minute delay creates a circuit-breaker.</p>
+
+                    <p>It's not about willpower. It's about interrupting the automatic response. In those 10 minutes, something shifts. The urge passes. You realize you weren't actually itching for news—you were just restless.</p>
+
+                    <h3>What to do in those 10 minutes</h3>
+                    <ul>
+                        <li>Walk around your room</li>
+                        <li>Drink a glass of water</li>
+                        <li>Look outside</li>
+                        <li>Do 10 pushups (surprisingly effective)</li>
+                        <li>Just sit and observe your own mind</li>
+                    </ul>
+
+                    <p>The activity doesn't matter. The interruption does.</p>
+                `
+            },
+            {
+                title: "Why quitting cold turkey failed (and what worked instead)",
+                meta: "6 min read • 2024",
+                content: `
+                    <p>Day 1 of no phone: I felt like a superhero.</p>
+                    <p>Day 3: I was itching to check the news.</p>
+                    <p>Day 5: I broke.</p>
+
+                    <p>Cold turkey doesn't work for most people, and it doesn't work for me. Here's why, and what I did instead.</p>
+
+                    <h3>Why cold turkey is brutal</h3>
+                    <p>Our brains are addicted to novelty and social validation. Removing the stimulus entirely doesn't kill the habit—it just creates anxiety. You're constantly thinking about the phone you can't have.</p>
+
+                    <div class="highlight">
+                        Cold turkey is like dieting by starving. It works for 3 days, then you're miserable and resentful.
+                    </div>
+
+                    <h3>The middle path that actually worked</h3>
+                    <p>Instead of elimination, I chose restriction with intention:</p>
+
+                    <ul>
+                        <li><strong>Specific apps have time limits.</strong> Not the phone—the apps.</li>
+                        <li><strong>Specific times are phone-free.</strong> Not the whole day—just mornings and meals.</li>
+                        <li><strong>Specific places are phone-free.</strong> Bed, bathroom, dinner table.</li>
+                    </ul>
+
+                    <p>This felt sustainable because I wasn't living in deprivation. My phone was still there. But it was less accessible, less rewarding, and less habitual.</p>
+
+                    <h3>The relapse pattern I noticed</h3>
+                    <p>I still "relapse" occasionally—scrolling for 30 minutes when I meant to check one thing. But here's what changed: I notice it now. And I stop. The relapse doesn't spiral into quitting my system.</p>
+
+                    <p>That's the win. Not perfection. Just awareness and course-correction.</p>
+                `
+            },
+            {
+                title: "My monthly phone audit: What I cut, kept, and questioned",
+                meta: "7 min read • 2024",
+                content: `
+                    <p>The one practice that's kept my phone habits in check isn't a rule—it's a monthly check-in. I call it my Phone Audit.</p>
+
+                    <h3>What the audit looks like</h3>
+                    <p>Once a month, usually on the first Sunday, I spend 15 minutes reviewing my phone:</p>
+
+                    <ol>
+                        <li><strong>What apps have I not opened?</strong> These are candidates for deletion.</li>
+                        <li><strong>What apps have I opened too much?</strong> These need timers or move off the home screen.</li>
+                        <li><strong>What's my average daily screen time?</strong> Am I trending up or down?</li>
+                        <li><strong>Which notifications are still enabled?</strong> Do I actually need them?</li>
+                    </ol>
+
+                    <h3>The three categories</h3>
+                    <div class="highlight">
+                        <strong>Cut:</strong> Apps that don't serve me. News apps, fitness apps I don't use, games that drain time. Deleted without guilt—I can reinstall if I need to.
+                    </div>
+
+                    <div class="highlight">
+                        <strong>Kept:</strong> Apps that genuinely improve my life. Messaging, maps, notes, a few select tools. These stay accessible and enabled.
+                    </div>
+
+                    <div class="highlight">
+                        <strong>Questioned:</strong> Apps in the middle. Social media, news, entertainment. These need timers, grayscale, or home screen exile. I ask: "Am I using this, or is it using me?"
+                    </div>
+
+                    <h3>The side effect I didn't expect</h3>
+                    <p>This monthly habit removes guilt. I'm not constantly wondering "Should I delete this?" I'm just checking in. It's a conversation with my phone, not a war against it.</p>
+
+                    <p>And paradoxically, being less restrictive feels more sustainable. I can have fun apps—they just have boundaries.</p>
+
+                    <p><strong>Try it:</strong> Set a monthly reminder. Spend 15 minutes with your settings. You'll be surprised what you find.</p>
+                `
+            }
+        ];
+
+        function openModal(index) {
+            const modal = document.getElementById('postModal');
+            const post = posts[index];
+            document.getElementById('modalTitle').textContent = post.title;
+            document.getElementById('modalMeta').textContent = post.meta;
+            document.getElementById('modalBody').innerHTML = post.content;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('postModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('postModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
